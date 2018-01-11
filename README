@@ -34,8 +34,7 @@ _______
 Here, there are two possibilities: To use preconfigured, and generic machines, which need to be configured
 
 The true preconfigured virtual machines are in the following directory:
-
-/homeuser/projects2/vagrant/VMs (it is NOT generic path, rather Zoran's one)
+/home/user/projects2/vagrant/VMs (it is NOT generic path, rather Zoran's one)
 _______
 
 [IMPORTANT - The following are just temporary debug traces, should be removed in the final version]
