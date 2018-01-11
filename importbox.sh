@@ -15,8 +15,8 @@
 
 # check number of parameters
 
-## Set markers for the RED color
-RED='\e[1;31m'
+## Set markers for the GREEN color
+GREEN='\e[1;32m'
 NC='\e[0m' # No Color
 
 ## Start the vagrant assignment algorithm
@@ -31,19 +31,19 @@ pathToBoxLocation=""
 if [ $# -eq 2 ] ; then
     pathToBoxLocation=$2
 fi
-echo -e "${RED}[1] Executing the command: vagrant box remove $boxName${NC}"
+echo -e "${GREEN}[1] Executing the command: vagrant box remove $boxName${NC}"
 vagrant box remove $boxName
 set -e
-echo -e "${RED}[2] Executing the command: vagrant box list [to check which VMs remain]${NC}"
+echo -e "${GREEN}[2] Executing the command: vagrant box list [to check which VMs remain]${NC}"
 vagrant box list
-echo -e "${RED}[3] Executing the command: vagrant box add $boxName $pathToBoxLocation${NC}"
+echo -e "${GREEN}[3] Executing the command: vagrant box add $boxName $pathToBoxLocation${NC}"
 vagrant box add $boxName $pathToBoxLocation
 if [ -f Vagrantfile ]; then
     rm Vagrantfile ## rm old Vagrantfile, if any?
     ls -al
 fi
 
-echo -e "${RED}[4] Executing the command: vagrant init $boxName${NC}"
+echo -e "${GREEN}[4] Executing the command: vagrant init $boxName${NC}"
 vagrant init $boxName
 ls -al Vagrantfile
 
@@ -59,12 +59,12 @@ else
     ls -al Vagrantfile
 fi
 
-echo -e "${RED}[5] Executing the command: vagrant box list [to check if new VM is added]${NC}"
+echo -e "${GREEN}[5] Executing the command: vagrant box list [to check if new VM is added]${NC}"
 vagrant box list
 
 # are any mods necessary?
 set +e
-echo -e "${RED}[6] Executing the command: vagrant up --provider virtualbox${NC}"
+echo -e "${GREEN}[6] Executing the command: vagrant up --provider virtualbox${NC}"
 echo "==> Available vm providers:"
 echo "1) libvirt"
 echo "2) virtualbox"
