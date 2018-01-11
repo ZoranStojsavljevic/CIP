@@ -28,6 +28,8 @@ fi
 ## set -e
 boxName=$1
 pathToBoxLocation=""
+provider="which provider?"
+
 if [ $# -eq 2 ] ; then
     pathToBoxLocation=$2
 fi
@@ -64,7 +66,7 @@ vagrant box list
 
 # are any mods necessary?
 set +e
-echo -e "${GREEN}[6] Executing the command: vagrant up --provider virtualbox${NC}"
+echo -e "${GREEN}[6] Executing the command: vagrant up --provider $provider${NC}"
 echo "==> Available vm providers:"
 echo "1) libvirt"
 echo "2) virtualbox"
