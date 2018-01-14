@@ -42,15 +42,16 @@ echo -e "${GREEN}[3] Executing the command: vagrant box add $boxName $pathToBoxL
 vagrant box add $boxName $pathToBoxLocation
 if [ -f Vagrantfile ]; then
     rm Vagrantfile ## rm old Vagrantfile, if any?
+    ls -al
 fi
 
 echo -e "${GREEN}[4] Executing the command: vagrant init $boxName${NC}"
 vagrant init $boxName
 ls -al Vagrantfile
 
-read -p "Do you want to overrwrite Vagrantfile with already provided generic Vagrantfile? [Y/n] " qm
+read -p "Do you want to overrwrite Vagrantfile with already provided generic Vagrantfile? [Y/n]" qm
 
-if [ -z $qm ] || [ $qm == 'Y' ] || [ $qm == 'y' ] ; then
+if [ -Z $qm ] || [ Y -eq $qm ] || [y -eq $qm ] ; then
     echo "Overwrite Vagrant file"
     cp Vagrantfile.genesis Vagrantfile
     sed -i Vagrantfile -e 's/boxName/'"$boxName"'/'
