@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copyright (C) 2017, Codethink, Ltd., Robert Marshall
-# Adopted file for Siemens AG CIP testing: Zoran Stojsavljevic
+# Adapted file for Siemens AG CIP testing: Zoran Stojsavljevic
 # SPDX-License-Identifier:	AGPL-3.0
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -13,20 +13,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# check number of parameters
-
 ## Set markers for the GREEN color
 GREEN='\e[1;32m'
 NC='\e[0m' # No Color
 
 ## Variables init
 pathToBoxLocation=""
-provider="which provider?"
 
 ## Start the vagrant assignment algorithm
+# check number of parameters
 if [ $# -ne 1 ] && [ $# -ne 2 ] ; then
-    echo "Usage: $0 boxName (boxName => genericName)"
-    echo "Usage: $0 pathToBoxLocation boxName"
+    echo "Usage: $0 boxName (boxName => genericName) | pathToBoxLocation boxName"
     exit 1
 fi
 
@@ -61,6 +58,7 @@ vagrant init $boxName
 ls -al Vagrantfile
 
 if [ $# -eq 1 ] ; then
+    echo "Copy Vagrantfile.genesis to Vagrantfile"
     cp Vagrantfile.genesis Vagrantfile
     sed -i -e 's\boxName\'"$boxName"'\' Vagrantfile
     ls -al Vagrantfile
@@ -74,7 +72,6 @@ vagrant box list
 
 # are any mods necessary?
 set +e
-echo -e "${GREEN}[6] Executing the command: vagrant up --provider $provider${NC}"
 echo "==> Available vm providers:"
 echo "1) libvirt"
 echo "2) virtualbox"
@@ -96,6 +93,7 @@ case $provider in
     ;;
 esac
 
+echo -e "${GREEN}[6] Executing the command: vagrant up --provider $myprovider${NC}"
 vagrant up --provider $myprovider
 echo The above should end with "==> default: KernelCI already configured remove ~/mybbb.dat to force configuration"
 echo and a report that the ssh command responded with a non-zero exit status. This is expected!
