@@ -1,12 +1,34 @@
 # Copyright (C) 2016-2017, Siemens AG, Wolfgang Mauerer <wolfgang.mauerer@siemens.com>
 # Copyright (C) 2016-2017, Codethink, Ltd., Robert Marshall <robert.marshall@codethink.co.uk>
-# Some changes added in 2018, Zoran Stojsavljevic <zoran.stojsavljevic@gmail.com>
+# Copyright (C) 2018-2018, Siemens AG, Zoran Stojsavljevic <zoran.stojsavljevic@gmail.com>
 # SPDX-License-Identifier:	AGPL-3.0
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 
 # This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
 
 # You should have received a copy of the GNU Affero General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+## Ensuring the plugins are installed
+##
+## There is no built-in vagrant command to make sure that a plugin is installed but since the Vagrantfile is a Ruby file, it is very easy to write a little bit of Ruby code to ensure that the plugin is installed.
+##
+## In the Vagrantfile before the Vagrant.configure(2) do |config| line added the following code snippet:
+
+## vagrant plugin install vagrant-proxyconf
+
+if !Vagrant.has_plugin?("vagrant-proxyconf")
+   system('vagrant plugin install vagrant-proxyconf')
+
+   raise("vagrant-proxyconf installed. Run command again.");
+end
+
+## vagrant plugin install vagrant-vbguest
+
+if !Vagrant.has_plugin?("vagrant-vbguest")
+    system('vagrant plugin install vagrant-vbguest')
+
+    raise("vagrant-vbguest installed. Run command again.");
+end
 
 $build = <<SCRIPT
 cd /vagrant
@@ -24,11 +46,18 @@ SCRIPT
 Vagrant.configure(2) do |config|
   config.vm.provider :virtualbox do |vbox, override|
     config.vm.box = "boxName"
-    
+
     vbox.customize ["modifyvm", :id, "--vram", "12"]
-    vbox.customize ["modifyvm", :id, "--memory", "2048"]
+    vbox.customize ["modifyvm", :id, "--memory", "4096"]
     vbox.customize ["modifyvm", :id, "--cpus", "2"]
     vbox.customize ["modifyvm", :id, "--usb", "on"]
+
+    ## system('vagrant plugin install vagrant-proxyconf')
+    if Vagrant.has_plugin?("vagrant-proxyconf")
+      config.proxy.http     = "http://194.145.60.1:9400/"
+      config.proxy.https    = "http://194.145.60.1:9400/"
+      config.proxy.no_proxy = "localhost,127.0.0.1,.siemens.com,.siemens.de,.siemens.net,.siemens.rocks,.siemens.io,.saacon.net"
+    end
   end
 
   config.vm.provider :libvirt do |libvirt|
