@@ -57,15 +57,10 @@ echo -e "${GREEN}[4] Executing the command: vagrant init $boxName${NC}"
 vagrant init $boxName
 ls -al Vagrantfile
 
-if [ $# -eq 1 ] ; then
-    echo "Copy Vagrantfile.genesis to Vagrantfile"
-    cp Vagrantfile.genesis Vagrantfile
-    sed -i -e 's\boxName\'"$boxName"'\' Vagrantfile
-    ls -al Vagrantfile
-else
-    echo "Keep original Vagrantfile"
-    ls -al Vagrantfile
-fi
+echo "Copy Vagrantfile.genesis to Vagrantfile"
+cp Vagrantfile.genesis Vagrantfile
+sed -i -e 's\boxName\'"$boxName"'\' Vagrantfile
+ls -al Vagrantfile
 
 echo -e "${GREEN}[5] Executing the command: vagrant box list [to check if new VM is added]${NC}"
 vagrant box list
