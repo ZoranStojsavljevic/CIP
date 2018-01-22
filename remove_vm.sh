@@ -12,26 +12,33 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-## Prepare all the relevant data for removing the vagrant machine
-cd $HOME/.config/VirtualBox
-VBOX_IMG_DIR=`cat VirtualBox.xml | grep defaultMachineFolder | grep -o -P '(?<=").*(?=" default)'`
-echo $VBOX_IMG_DIR
-cd -
+## Print out all the relevant data for the vagrant machine and underlying Virtual Box
+## Find Virtual Box VM machine directory
+VBOX_IMG_DIR=`vboxmanage list systemproperties | grep "Default machine folder" | cut -b 34-`
+echo "Virtual Box VM machine directory: $VBOX_IMG_DIR"
 
 if [ ! -d ".vagrant" ]; then
     echo "vagrant machine not created"
     exit 1
 fi
 
-vm_id=`cat .vagrant/machines/default/virtualbox/id`
-echo $vm_id
-vbox_name=`vboxmanage list vms | grep $vm_id | sed 's/_/ /' | cut -f1 -d" " | sed 's/"//'`
-vagrant_name=`vagrant box list | grep $vbox_name | cut -f1 -d" "`
-echo "vbox name is $vbox_name"
-echo "vagrant name is $vagrant_name"
+## Find the UUID of the currently used Virtual Box machine
+vbox_uuid=`cat .vagrant/machines/default/virtualbox/id`
+echo "The UUID of the currently used Virtual Box machine $vbox_uuid"
 
-echo "what vagrant machines are in the system?"
+## Find the UUID of the currently used vagrant machine
+vagrant_uuid=`cat .vagrant/machines/default/virtualbox/index_uuid`
+echo "The UUID of the currently used vagrant machine $vagrant_uuid"
+
+echo "What vagrant machines are active in the system?"
 vagrant box list
+
+echo "What Virtual Box machines are active in the system?"
+vboxmanage list vms
+
+vagrant destroy $vagrant_uuid
+
+exit 1
 
 ## Start removal of the $vagrant_name machine
 vagrant box remove $vagrant_name
@@ -50,11 +57,11 @@ ls -al
 echo "present VMs in the system:"
 vboxmanage list vms
 
-echo "$vm_id vm machine to be shut down"
-VBoxManage controlvm "${vm_id}" poweroff
+echo "$vm_id vm machine to be shutdown - brute force (?) shutdown"
+VBoxManage controlvm "${vbox_uuid}" poweroff
 sleep 2
 echo "$vm_id vm machine to be removed"
-vboxmanage unregistervm "${vm_id}" --delete
+vboxmanage unregistervm "${vbox_uuid}" --delete
 
 echo "remaining VM machines in $VBOX_IMG_DIR:"
 ls -al
