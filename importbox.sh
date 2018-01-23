@@ -22,17 +22,12 @@ pathToBoxLocation=""
 
 ## Start the vagrant assignment algorithm
 # check number of parameters
-if [ $# -ne 1 ] && [ $# -ne 2 ] ; then
-    echo "Usage: $0 boxName (boxName => genericName) | pathToBoxLocation boxName"
+if [ $# -ne 2 ] ; then
+    echo "Usage: $0 pathToBoxLocation boxName"
     exit 1
-fi
 
-if [ $# -eq 1 ] ; then
-    boxName=$1
-else
-    pathToBoxLocation=$1
-    boxName=$2
-fi
+pathToBoxLocation=$1
+boxName=$2
 
 echo -e "${GREEN}[1] Executing the command: vagrant box list [to check which VMs are in the pool]${NC}"
 vagrant box list
@@ -46,27 +41,8 @@ else
     echo "Old box did not exist"
 fi
 
-set -e
-echo -e "${GREEN}[3] Executing the command: vagrant box add $boxName $pathToBoxLocation${NC}"
-vagrant box add $boxName $pathToBoxLocation
-if [ -f Vagrantfile ]; then
-    rm Vagrantfile ## rm old Vagrantfile, if any?
-fi
+## set -e
 
-echo -e "${GREEN}[4] Executing the command: vagrant init $boxName${NC}"
-vagrant init $boxName
-ls -al Vagrantfile
-
-echo "Copy Vagrantfile.genesis to Vagrantfile"
-cp Vagrantfile.genesis Vagrantfile
-sed -i -e 's\boxName\'"$boxName"'\' Vagrantfile
-ls -al Vagrantfile
-
-echo -e "${GREEN}[5] Executing the command: vagrant box list [to check if new VM is added]${NC}"
-vagrant box list
-
-# are any mods necessary?
-set +e
 echo "==> Available vm providers:"
 echo "1) libvirt"
 echo "2) virtualbox"
@@ -88,8 +64,26 @@ case $provider in
     ;;
 esac
 
-echo -e "${GREEN}[6] Executing the command: vagrant up --provider $myprovider${NC}"
-vagrant up --provider $myprovider
+echo -e "${GREEN}[3] Executing the command: vagrant box add --name $boxName $pathToBoxLocation --provider $myprovider${NC}"
+vagrant box add $boxName $pathToBoxLocation --provider $myprovider
+if [ -f Vagrantfile ]; then
+    rm Vagrantfile ## rm old Vagrantfile, if any?
+fi
+
+echo -e "${GREEN}[4] Executing the command: vagrant init $boxName${NC}"
+vagrant init $boxName
+
+echo "The Vagrantfile.genesis ==>> Vagrantfile"
+cp Vagrantfile.genesis Vagrantfile
+sed -i -e 's\boxName\'"$boxName"'\' Vagrantfile
+
+echo -e "${GREEN}[5] Executing the command: vagrant box list [to check if new VM is added]${NC}"
+vagrant box list
+
+## set +e
+
+echo -e "${GREEN}[6] Executing the command: vagrant up ## --provider $myprovider$ already done{NC}"
+vagrant up
 echo The above should end with "==> default: KernelCI already configured remove ~/mybbb.dat to force configuration"
 echo and a report that the ssh command responded with a non-zero exit status. This is expected!
 echo
