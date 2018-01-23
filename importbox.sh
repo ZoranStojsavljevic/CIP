@@ -25,7 +25,8 @@ pathToBoxLocation=""
 if [ $# -ne 2 ] ; then
     echo "Usage: $0 pathToBoxLocation boxName"
     exit 1
-
+fi
+    
 pathToBoxLocation=$1
 boxName=$2
 
@@ -82,8 +83,8 @@ vagrant box list
 
 ## set +e
 
-echo -e "${GREEN}[6] Executing the command: vagrant up ## --provider $myprovider$ already done{NC}"
-vagrant up
+echo -e "${GREEN}[6] Executing the command: vagrant up --provider $myprovider${NC}"
+vagrant up --provider $myprovider$
 echo The above should end with "==> default: KernelCI already configured remove ~/mybbb.dat to force configuration"
 echo and a report that the ssh command responded with a non-zero exit status. This is expected!
 echo
