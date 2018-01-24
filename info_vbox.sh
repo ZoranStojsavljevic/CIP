@@ -19,6 +19,7 @@
 ## Find Virtual Box VM machine directory
 VBOX_IMG_DIR=`vboxmanage list systemproperties | grep "Default machine folder" | cut -b 34-`
 echo "Virtual Box VM machine directory: $VBOX_IMG_DIR"
+echo ""
 
 if [ ! -d ".vagrant" ]; then
     echo "vagrant machine not created"
@@ -27,17 +28,26 @@ fi
 
 ## Find the UUID of the currently used Virtual Box machine
 vbox_uuid=`cat .vagrant/machines/default/virtualbox/id`
-echo "The UUID of the currently used Virtual Box machine $vbox_uuid"
+echo "The UUID of the currently used VBox    machine: $vbox_uuid"
 
 ## Find the UUID of the currently used vagrant machine
 vagrant_uuid=`cat .vagrant/machines/default/virtualbox/index_uuid`
-echo "The UUID of the currently used vagrant machine $vagrant_uuid"
+echo "The UUID of the currently used vagrant machine: $vagrant_uuid"
+echo ""
 
 echo "What vagrant machines are active in the system?"
 vagrant box list
+echo ""
 
 echo "What Virtual Box machines are active in the system?"
 vboxmanage list vms
+echo""
 
-echo "Do we want to destroy vagrant machine, affecting/destroying Virtual Box VM as well?"
-vagrant destroy $vagrant_uuid
+echo "Check Global Status on the Vagrant environment of this machine"
+echo "This data is cached and may not be completely up-to-date."
+echo "Vagrant global status gives vagrant UUIDs, _NOT_ VBox ones!"
+echo""
+vagrant global-status
+
+## echo "Do we want to destroy vagrant machine, affecting/destroying Virtual Box VM as well?"
+## vagrant destroy $vagrant_uuid
