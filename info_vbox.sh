@@ -12,6 +12,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+## This shell script is helper script, which shows dependencies between Vagrant and
+## its most popular provider Virtual Box.
+
 ## Print out all the relevant data for the vagrant machine and underlying Virtual Box
 ## Find Virtual Box VM machine directory
 VBOX_IMG_DIR=`vboxmanage list systemproperties | grep "Default machine folder" | cut -b 34-`

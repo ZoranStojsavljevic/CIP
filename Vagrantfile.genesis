@@ -37,6 +37,7 @@ Vagrant.configure(2) do |config|
     vbox.customize ["modifyvm", :id, "--usb", "on"]
 
     ## vagrant plugin install vagrant-vbguest
+    ## vagrant-vbguest: a vagrant plugin to keep VirtualBox Guest Additions up to date 
     if !Vagrant.has_plugin?("vagrant-vbguest")
       system('vagrant plugin install vagrant-vbguest')
 
@@ -47,6 +48,22 @@ Vagrant.configure(2) do |config|
   config.vm.provider :libvirt do |libvirt|
     libvirt.memory = 2048
     libvirt.cpus = 2
+
+    ## libvirt specific plugins installations!
+
+    ## vagrant plugin install libvirt
+    if !Vagrant.has_plugin?("libvirt")
+      system('vagrant plugin install libvirt')
+
+      raise("libvirt installed. Run command again.");
+    end
+
+    ## vagrant plugin install vagrant-libvirt
+    if !Vagrant.has_plugin?("vagrant-libvirt")
+      system('vagrant plugin install libvirt')
+
+      raise("vagrant-libvirt installed. Run command again.");
+    end
   end
 
   ## Common stuff, independept of the "any" Virtual Provider used!
@@ -62,6 +79,9 @@ Vagrant.configure(2) do |config|
     config.proxy.https    = "http://194.145.60.1:9400/"
     config.proxy.no_proxy = "localhost,127.0.0.1,.siemens.com,.siemens.de,.siemens.net,.siemens.rocks,.siemens.io,.saacon.net"
   end
+
+  ##  List all the relevant plugins in the system - checkpoint
+  system('vagrant plugin list')
 
   # Forward port 8888 for the internal REST server 
   config.vm.network :forwarded_port, guest: 8888, host: 8888
