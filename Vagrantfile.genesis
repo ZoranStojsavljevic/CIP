@@ -79,8 +79,8 @@ Vagrant.configure(2) do |config|
 =end
   end
 
-  ##  List all the relevant plugins in the system - checkpoint
-  system('vagrant plugin list')
+  ## List all the relevant plugins in the system - checkpoint
+  ## system('vagrant plugin list')
 
   # Forward port 8888 for the internal REST server
   config.vm.network :forwarded_port, guest: 8888, host: 8888
