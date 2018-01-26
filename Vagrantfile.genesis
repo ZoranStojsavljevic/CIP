@@ -46,21 +46,22 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provider :libvirt do |libvirt|
+    config.vm.box = "boxName"
     libvirt.memory = 2048
     libvirt.cpus = 2
 
     ## libvirt specific plugins installations!
 
-    ## vagrant plugin install vagrant-libvirt
-    ## implicit call to install plugin libvirt
-    ## if !Vagrant.has_plugin?("vagrant-libvirt")
-    ##  system('vagrant plugin install libvirt')
+    ## implicit call to install plugin vagrant-libvirt
+    if !Vagrant.has_plugin?("vagrant-libvirt")
+      system('vagrant plugin install vagrant-libvirt')
 
-    ##  raise("vagrant-libvirt installed. Run command again.");
-    ## end
+      raise("vagrant-libvirt installed. Run command again.");
+    end
   end
 
   ## Common stuff, independept of the "any" Virtual Provider used!
+
   ## system('vagrant plugin install vagrant-proxyconf')
   if !Vagrant.has_plugin?("vagrant-proxyconf")
     system('vagrant plugin install vagrant-proxyconf')
@@ -69,15 +70,19 @@ Vagrant.configure(2) do |config|
   end
 
   if Vagrant.has_plugin?("vagrant-proxyconf")
+=begin ## multicomment way in Ruby, with tuple: {=begin ; =end}
     config.proxy.http     = "http://194.145.60.1:9400/"
     config.proxy.https    = "http://194.145.60.1:9400/"
+    config.proxy.ftp      = "http://194.145.60.1:9400/"
+    ## config.proxy.all      = "http://194.145.60.1:9400/"
     config.proxy.no_proxy = "localhost,127.0.0.1,.siemens.com,.siemens.de,.siemens.net,.siemens.rocks,.siemens.io,.saacon.net"
+=end
   end
 
   ##  List all the relevant plugins in the system - checkpoint
   system('vagrant plugin list')
 
-  # Forward port 8888 for the internal REST server 
+  # Forward port 8888 for the internal REST server
   config.vm.network :forwarded_port, guest: 8888, host: 8888
   # Forward port 8010 for the Storage Server
   config.vm.network :forwarded_port, guest: 8010, host: 8010
