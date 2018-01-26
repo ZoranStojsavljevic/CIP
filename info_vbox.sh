@@ -48,6 +48,3 @@ echo "This data is cached and may not be completely up-to-date."
 echo "Vagrant global status gives vagrant UUIDs, _NOT_ VBox ones!"
 echo""
 vagrant global-status
-
-## echo "Do we want to destroy vagrant machine, affecting/destroying Virtual Box VM as well?"
-## vagrant destroy $vagrant_uuid
