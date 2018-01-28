@@ -46,7 +46,7 @@ Vagrant.configure(2) do |config|
     libvirt.storage_pool_name = "default"
     libvirt.host = #{host}
     libvirt.username = #{user}
-    ## libvirt.connect_via_ssh = 1
+    ## libvirt.connect_via_ssh = true
 
     ## libvirt specific plugins installations!
 
@@ -90,9 +90,8 @@ Vagrant.configure(2) do |config|
   # Forward port 443 for the https Lava Frontend Web Server
   config.vm.network :forwarded_port, guest: 443, host: 4443
   # Configure network accessibility for tftp server
-  config.vm.network "public_network", :dev => "wlo1", :mode => 'nat', use_dhcp_assigned_default_route: true
-  ## config.vm.network "public_network", :dev => "wlo1", :mode => 'nat', :type => "nat"
-  ## config.vm.network "public_network", :dev => "br0", :mode => 'bridge', :type => "bridge"
+  # config.vm.network "public_network", :dev => "ens5", use_dhcp_assigned_default_route: true
+  # config.vm.network "public_network", use_dhcp_assigned_default_route: true
 
   config.vm.provision "shell" do |s|
     s.privileged = false
