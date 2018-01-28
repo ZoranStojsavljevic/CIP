@@ -53,11 +53,13 @@ case $provider in
 [1])
     echo "The vm provider is libvirt"
     myprovider="libvirt"
+    cp Vagrantfile.libvirt Vagrantfile.genesis
     ;;
 
 [2])
     echo "The vm provider is virtualbox"
     myprovider="virtualbox"
+    cp Vagrantfile.virtualbox Vagrantfile.genesis
     ;;
 
 *)

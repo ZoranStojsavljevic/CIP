@@ -1,0 +1,103 @@
+# Copyright (C) 2016-2017, Siemens AG, Wolfgang Mauerer <wolfgang.mauerer@siemens.com>
+# Copyright (C) 2016-2017, Codethink, Ltd., Robert Marshall <robert.marshall@codethink.co.uk>
+# Copyright (C) 2018-2018, Siemens AG, Zoran Stojsavljevic <zoran.stojsavljevic@gmail.com>
+# SPDX-License-Identifier:	AGPL-3.0
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+## Ensuring the plugins are installed
+##
+## There is no built-in vagrant command to make sure that a plugin is installed but since the Vagrantfile is a Ruby file, it is very easy to write a little bit of Ruby code to ensure that the plugin is installed.
+##
+## In the Vagrantfile before the Vagrant.configure(2) do |config| line added the following code snippet:
+
+require 'etc'
+
+$build = <<SCRIPT
+cd /vagrant
+set -e
+integration-scripts/install_ifupdown_workaround.sh
+integration-scripts/install_dependencies.sh
+integration-scripts/install_backend.sh
+integration-scripts/install_frontend.sh
+integration-scripts/install_build_script.sh
+integration-scripts/configure_singledev.sh
+integration-scripts/install_lava.sh
+integration-scripts/configure_lava.sh
+SCRIPT
+
+Vagrant.configure(2) do |config|
+  host = Socket.gethostname
+  puts "Value of the host name is #{host}"
+  user = Etc.getlogin
+  puts "Value of the user is #{user}"
+
+  config.ssh.proxy_command = "/usr/bin/ssh -A -t #{host} nc %h %p"
+  config.ssh.forward_agent = true
+
+  # Libvirt Settings
+  config.vm.provider :libvirt do |libvirt|
+    config.vm.box = "boxName"
+    libvirt.memory = 2048
+    libvirt.cpus = 2
+    libvirt.storage_pool_name = "default"
+    libvirt.host = #{host}
+    libvirt.username = #{user}
+    ## libvirt.connect_via_ssh = 1
+
+    ## libvirt specific plugins installations!
+
+    ## implicit call to install plugin vagrant-libvirt
+    if !Vagrant.has_plugin?("vagrant-libvirt")
+      system('vagrant plugin install vagrant-libvirt')
+
+      raise("vagrant-libvirt installed. Run command again.");
+    end
+  end
+
+  ## Common stuff, independept of the "any" Virtual Provider used!
+
+  ## system('vagrant plugin install vagrant-proxyconf')
+  if !Vagrant.has_plugin?("vagrant-proxyconf")
+    system('vagrant plugin install vagrant-proxyconf')
+
+    raise("vagrant-proxyconf installed. Run command again.");
+  end
+
+  if Vagrant.has_plugin?("vagrant-proxyconf")
+=begin ## multicomment way in Ruby, with tuple: {=begin ; =end}
+    config.proxy.http     = "http://194.145.60.1:9400/"
+    config.proxy.https    = "http://194.145.60.1:9400/"
+    config.proxy.ftp      = "http://194.145.60.1:9400/"
+    ## config.proxy.all      = "http://194.145.60.1:9400/"
+    config.proxy.no_proxy = "localhost,127.0.0.1,.siemens.com,.siemens.de,.siemens.net,.siemens.rocks,.siemens.io,.saacon.net"
+=end
+  end
+
+  # Forward port 2222 for the ssh server
+  config.vm.network :forwarded_port, guest: 22, host: 2222
+  # Forward port 8888 for the internal REST server
+  config.vm.network :forwarded_port, guest: 8888, host: 8888
+  # Forward port 8010 for the Storage Server
+  config.vm.network :forwarded_port, guest: 8010, host: 8010
+  # Forward port 5000 for the KernelCI Frontend Web Server
+  config.vm.network :forwarded_port, guest: 5000, host: 5000
+  # Forward port 80 for the http Lava Frontend Web Server
+  config.vm.network :forwarded_port, guest: 8080, host: 8080
+  # Forward port 443 for the https Lava Frontend Web Server
+  config.vm.network :forwarded_port, guest: 443, host: 4443
+  # Configure network accessibility for tftp server
+  config.vm.network "public_network", :dev => "wlo1", :mode => 'nat', use_dhcp_assigned_default_route: true
+  ## config.vm.network "public_network", :dev => "wlo1", :mode => 'nat', :type => "nat"
+  ## config.vm.network "public_network", :dev => "br0", :mode => 'bridge', :type => "bridge"
+
+  config.vm.provision "shell" do |s|
+    s.privileged = false
+    s.inline = $build
+  end
+
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+end
