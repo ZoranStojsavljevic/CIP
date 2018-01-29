@@ -53,13 +53,13 @@ case $provider in
 [1])
     echo "The vm provider is libvirt"
     myprovider="libvirt"
-    cp Vagrantfile.libvirt Vagrantfile.genesis
+    cp Vagrantfile.libvirt Vagrantfile.tmp
     ;;
 
 [2])
     echo "The vm provider is virtualbox"
     myprovider="virtualbox"
-    cp Vagrantfile.virtualbox Vagrantfile.genesis
+    cp Vagrantfile.virtualbox Vagrantfile.tmp
     ;;
 
 *)
@@ -76,8 +76,8 @@ fi
 echo -e "${GREEN}[4] Executing the command: vagrant init $boxName${NC}"
 vagrant init $boxName
 
-echo "The Vagrantfile.genesis ==>> Vagrantfile"
-cp Vagrantfile.genesis Vagrantfile
+echo "Vagrantfile.tmp ==>> Vagrantfile"
+mv Vagrantfile.tmp Vagrantfile
 sed -i -e 's\boxName\'"$boxName"'\' Vagrantfile
 
 echo -e "${GREEN}[5] Executing the command: vagrant box list [to check if new VM is added]${NC}"
