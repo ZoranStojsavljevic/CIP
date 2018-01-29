@@ -31,13 +31,14 @@ Vagrant.configure(2) do |config|
   config.vm.provider :virtualbox do |vbox, override|
     config.vm.box = "boxName"
 
-    vbox.customize ["modifyvm", :id, "--vram", "12"]
+    vbox.customize ["modifyvm", :id, "--vram", "128"]
     vbox.customize ["modifyvm", :id, "--memory", "4096"]
     vbox.customize ["modifyvm", :id, "--cpus", "2"]
     vbox.customize ["modifyvm", :id, "--usb", "on"]
+    vbox.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
 
     ## vagrant plugin install vagrant-vbguest
-    ## vagrant-vbguest: a vagrant plugin to keep VirtualBox Guest Additions up to date 
+    ## vagrant-vbguest: a vagrant plugin to keep VirtualBox Guest Additions up to date
     if !Vagrant.has_plugin?("vagrant-vbguest")
       system('vagrant plugin install vagrant-vbguest')
 
