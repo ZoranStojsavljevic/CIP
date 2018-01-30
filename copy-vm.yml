@@ -1,0 +1,18 @@
+---
+ - hosts: stretch64
+   user: root
+   tasks:
+    - name: copy /etc/egtab
+      copy: src=./egtab dest=/etc/egtab
+    - name: copy /etc/network/interfaces
+      copy: src=./interfaces dest=/etc/network/interfaces
+    - name: install egctl
+      action: apt-get name=egctl state=installed
+    - name: install tree
+      action: apt-get name=tree state=installed
+    - name: install ndiswrapper
+      action: apt-get name=ndiswrapper state=installed
+    - name: install ndiswrapper-dkms
+      action: apt-get name=ndiswrapper-dkms state=installed
+    - name: install ndiswrapper-source
+      action: apt-get name=ndiswrapper-source state=installed
