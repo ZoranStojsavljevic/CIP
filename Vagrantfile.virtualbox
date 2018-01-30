@@ -39,7 +39,7 @@ Vagrant.configure(2) do |config|
 
     ## Run Ansible from the Vagrant Host
     config.vm.provision "ansible" do |ansible|
-      ansible.playbook = "./private-net/copy-host-vm.yml"
+      ansible.playbook = "./private-net/copy-vm.yml"
       ansible.verbose = "vvv"
     end
 
