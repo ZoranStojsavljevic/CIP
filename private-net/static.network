@@ -1,0 +1,7 @@
+## /etc/systemd/network/static.network
+
+[Match]
+Name=eth2
+
+[Network]
+Address=192.168.15.2/24
