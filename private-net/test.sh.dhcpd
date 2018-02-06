@@ -1,0 +1,160 @@
+#!/bin/bash
+
+echo "START test script: test.sh"
+
+## Check if there is a route to www/0.0.0.0, so the necessary setup could be performed
+T_VAR=`ip route show | grep default | awk '{print $1}'`
+
+echo "default route installed? $T_VAR"
+
+if [ "$T_VAR" != "default" ]; then
+	## More code to check eth0 i/f and specific VBox gw IP address must be added here
+	ip route add default via 10.0.2.2 dev eth0
+	sleep 1 ## wait for ip route add default to perform!
+	T_VAR=`ip route show | grep default | awk '{print $1}'`
+	if [ "$T_VAR" != "default" ]; then
+		exit 127
+	fi
+fi
+
+## Configure the static network
+
+if [ ! -f /etc/systemd/network/10-static.network ]; then
+        cp ./10-static.network /etc/systemd/network/10-static.network
+	cp ./20-dhcp.network /etc/systemd/network/20-dhcp.network
+	ls -al /etc/systemd/network/
+fi
+
+## Check upon systemd-networkd?
+
+systemctl --no-ask-password restart systemd-networkd
+networkctl
+
+## : <<'COMMENT' ## This is the beginning of the multiline comment
+
+## Test along the execution
+ip route show ## > /dev/null
+
+## Test eth2 interface, since this one (so far) is used as pass-through!
+
+T_VAR=`ifconfig -a | grep "eth2" | awk '{print $1}' | sed 's/://g'`
+
+if [ "$T_VAR" != "eth2" ]; then
+	echo "VMM USB/ETH passthrough mechanism failed!"
+	exit 127
+fi
+
+T_VAR=`ifconfig -a eth2 | grep 'inet ' | awk '{print $2}'`
+
+if [ -z "$T_VAR" ]; then
+	## give to eth2 the formal static address for DHCP init
+	ifconfig eth2 192.168.15.2 up
+fi
+
+## Test along the execution
+ifconfig eth2 ## > /dev/null
+## COMMENT
+
+## exit 333 ## $? Shows 333-256 = 77
+
+## Configure and test power switch - egctl
+
+T_VAR=`apt search egctl | grep installed | awk '{print $4}'`
+
+## Test along the execution
+echo "egctl is installed? $T_VAR"
+
+if [ -z "$T_VAR" ]; then
+        ## installation of egctl must be performed!
+        apt-get install egctl
+	cp ./egtab /etc/egtab
+fi
+
+## Test egctl (do we really need such a extensive testing)?
+egctl egenie on on off off
+sleep 1
+egctl egenie on off on off
+sleep 1
+egctl egenie on off off on
+sleep 1
+egctl egenie on off off off
+
+##-----------------------------------------
+
+## Processing tftpd server
+
+T_VAR=`which in.tftpd`
+
+## Test along the execution
+echo "tftpd installed? $T_VAR"
+
+if [ -z "$T_VAR" ]; then
+        ## installation of tftpd-hpa must be performed!
+        apt-get install tftpd-hpa
+fi
+
+## Does tftpd config file exist?
+if [ -f /etc/default/tftpd-hpa ]; then
+	T_VAR=`cat /etc/default/tftpd-hpa | grep "0.0.0.0:69" | sed 's/"/ /g' | awk '{print $2}'`
+	## Test along the execution
+	if [ "$T_VAR" == "0.0.0.0:69" ]; then
+		echo "Listening on all network UDP ports? $T_VAR"
+	else
+		cp ./tftpd-hpa /etc/default/tftpd-hpa
+		echo " Creating the politically correct tftpd-hpa config file"
+	fi
+fi
+
+## Does tftpd runs in the VM (should)?
+T_VAR=`ps -e | grep in.tftpd | head -1 | awk '{print $4}'`
+echo "TFTPD process is: $T_VAR"
+if [ "$T_VAR" != "in.tftpd" ]; then
+	echo "Restarting in.tftpd server!"
+	/etc/init.d/tftpd-hpa restart
+fi
+
+## DHCPD service, running here as server
+
+## netstat -lp | grep -i dhcpd ???
+
+T_VAR=`apt search isc-dhcp-server | grep installed | awk '{print $4}'`
+
+## Test along the execution
+echo "isc-dhcp-server installed? $T_VAR"
+
+if [ -z "$T_VAR" ]; then
+        ## installation of egctl must be performed - for U-BOOT!
+        apt-get install isc-dhcp-server
+fi
+
+## Here, the specification is on which interface dhcpd service will start first???
+
+if [ ! -d /etc/sysconfig ]; then
+        mkdir /etc/sysconfig
+        touch /etc/sysconfig/dhcpd
+        echo  'DHCPDARGS="eth2"' >> /etc/sysconfig/dhcpd
+        echo "This is a /etc/sysconfig/dhcpd file!"
+        cat /etc/sysconfig/dhcpd
+fi
+
+## This must be done, since this is the 
+cp ./dhcpd.conf /etc/dhcp/dhcpd.conf
+
+if [ -f  /usr/lib/systemd/system/dhcpd.service ]; then
+	cp /usr/lib/systemd/system/dhcpd.service /etc/systemd/system/dhcpd@.service
+else
+	echo "the file /usr/lib/systemd/system/dhcpd.service was NOT found!"
+	echo "Creating one from the local directory!"
+	cp ./dhcpd@.service /etc/systemd/system/dhcpd@.service
+fi
+
+## Check upon user and group dhcpd. Do they exist???
+T_VAR=`cat /etc/passwd | grep dhcpd | sed 's/:/ /g' | awk '{print $1}'`
+
+## Test along the execution
+echo " user dhcpd does exist? $T_VAR"
+
+if [ -z "$T_VAR" ]; then
+	## create user: dhcpd and group dhcpd silently!
+	adduser -system --no-create-home --disabled-login --disabled-password --shell /usr/sbin/nologin --gecos "" --group dhcpd
+fi
