@@ -1,22 +1,4 @@
 #!/bin/bash
-# Copyright (C) 2018, Siemens AG, Zoran Stojsavljevic
-# SPDX-License-Identifier:	AGPL-3.0
-# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
-
-# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
-
-# You should have received a copy of the GNU Affero General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-echo "START: conf_private_net.sh"
-
-## Configure network interfaces
-## sudo copy ./interfaces /etc/network/interfaces
-## sudo apt-get install ndiswrapper ndiswrapper-dkms ndiswrapper-source
-
-## Put some additional useful packages into VM
-## sudo apt-get install usbutils usbip-utils
-
-sudo su ## become a superuser
 
 echo "START test script: test.sh"
 
@@ -59,7 +41,7 @@ ifconfig eth2 > /dev/null
 
 ## [3] dnsmasq service, running here as server
 
-T_VAR=`apt search dnsmasq | grep installed | head -1 | awk '{print $4}'` > /dev/null
+T_VAR=`apt search dnsmasq 2> /dev/null | grep installed | head -1 | awk '{print $4}'`
 
 ## Test along the execution
 echo "dnsmasq installed? $T_VAR"
@@ -118,7 +100,7 @@ fi
 
 ## [5] Configure and test power switch - egctl
 
-T_VAR=`apt search egctl | grep installed | awk '{print $4}'` > /dev/null
+T_VAR=`apt search egctl 2> /dev/null | grep installed | awk '{print $4}'`
 
 ## Test along the execution
 echo "egctl is installed? $T_VAR"
@@ -131,13 +113,13 @@ if [ "$T_VAR" != "[installed]" ]; then
 fi
 
 ## Switch on egctl
-egctl egenie off off off off
+egctl egenie off off off off > /dev/null
 sleep 1
-egctl egenie on off off off
+egctl egenie on off off off > /dev/null
 
 ## [6] Configure and test nmap application - nmap
 
-T_VAR=`apt search nmap | grep installed | awk '{print $4}'` > /dev/null
+T_VAR=`apt search nmap 2> /dev/null | grep installed | awk '{print $4}'`
 
 ## Test along the execution
 echo "nmap is installed? $T_VAR"
@@ -148,7 +130,7 @@ if [ "$T_VAR" != "[installed]" ]; then
         apt-get install nmap
 fi
 
-## start systemd-networkd
+## [7] start systemd-networkd
 systemctl --no-ask-password restart systemd-networkd
 sleep 1
 
