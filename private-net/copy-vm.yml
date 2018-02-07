@@ -6,13 +6,17 @@
       copy: src=./egtab dest=/etc/egtab
     - name: copy /etc/network/interfaces
       copy: src=./interfaces dest=/etc/network/interfaces
-    - name: install egctl
-      action: apt-get name=egctl state=installed
-    - name: install tree
-      action: apt-get name=tree state=installed
-    - name: install ndiswrapper
-      action: apt-get name=ndiswrapper state=installed
-    - name: install ndiswrapper-dkms
-      action: apt-get name=ndiswrapper-dkms state=installed
-    - name: install ndiswrapper-source
-      action: apt-get name=ndiswrapper-source state=installed
+    - name: installing egctl
+      action: apt name=egctl state=installed
+    - name: installing tree
+      action: apt name=tree state=installed
+    - name: installing ndiswrapper
+      action: apt name=ndiswrapper state=installed
+    - name: installing ndiswrapper-dkms
+      action: apt name=ndiswrapper-dkms state=installed
+    - name: installing ndiswrapper-source
+      action: apt name=ndiswrapper-source state=installed
+    - name: installing usbutils
+      action: apt name=usbutils state=installed
+    - name: installing usbip-utils
+      action: apt name=usbip-utils state=installed

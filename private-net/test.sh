@@ -1,4 +1,22 @@
 #!/bin/bash
+# Copyright (C) 2018, Siemens AG, Zoran Stojsavljevic
+# SPDX-License-Identifier:	AGPL-3.0
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+echo "START: conf_private_net.sh"
+
+## Configure network interfaces
+## sudo copy ./interfaces /etc/network/interfaces
+## sudo apt-get install ndiswrapper ndiswrapper-dkms ndiswrapper-source
+
+## Put some additional useful packages into VM
+## sudo apt-get install usbutils usbip-utils
+
+sudo su ## become a superuser
 
 echo "START test script: test.sh"
 
@@ -112,12 +130,8 @@ if [ "$T_VAR" != "[installed]" ]; then
         cp ./egtab /etc/egtab
 fi
 
-## Test egctl (do we really need such a extensive testing)?
-egctl egenie on on off off
-sleep 1
-egctl egenie on off on off
-sleep 1
-egctl egenie on off off on
+## Switch on egctl
+egctl egenie off off off off
 sleep 1
 egctl egenie on off off off
 
@@ -134,7 +148,12 @@ if [ "$T_VAR" != "[installed]" ]; then
         apt-get install nmap
 fi
 
+## start systemd-networkd
+systemctl --no-ask-password restart systemd-networkd
+sleep 1
+
 ## check the network?
 nmap -sP 192.168.15.*&
 wait  %1
+
 networkctl
