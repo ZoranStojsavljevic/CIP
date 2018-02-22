@@ -1,0 +1,2 @@
+{% extends 'beaglebone-black.jinja2' %}
+{% set connection_command = '/vagrant/scripts/connectBBB.sh localhost 8020 root lavauser123' %}

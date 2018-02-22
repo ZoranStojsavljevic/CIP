@@ -1,0 +1,6 @@
+{% extends 'beaglebone-black.jinja2' %}
+{% set connection_command = '/vagrant/scripts/connectBBB.sh localhost 8020 nobodyless mylava1234' %}
+{% set power_on_command = '/usr/bin/egctl egenie on left left left' %}
+{% set power_off_command = '/usr/bin/egctl egenie off left left left' %}
+## {% set hard_reset_command = '/usr/bin/pduclient --daemon tweetypie --hostname pdu --command reboot --port 08' %}
+## {% set connection_command = 'telnet droopy 4001' %}
