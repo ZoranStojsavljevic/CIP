@@ -14,6 +14,8 @@
 
 echo "START test script: test.sh"
 
+CURRENT_DIR=`pwd`
+
 ## Change owner of the private-net directory since these are the system settings
 chown -R root:root /vagrant1/private-net
 
@@ -64,15 +66,15 @@ echo "dnsmasq installed? $T_VAR"
 if [ "$T_VAR" != "[installed]" ]; then
         ## installation of dnsmasq must be performed - for the private VMM passthrough device network!
 	echo "Installing: apt-get install dnsmasq"
-        apt-get install dnsmasq
+        DEBIAN_FRONTEND=noninteractive apt-get -y install dnsmasq
 fi
 
 ## Here, the specification is on which interface dhcpd service will start???
 
-if [ ! -f /etc/dnsmasq.conf ]; then
-        cp  ./dnsmasq.conf /etc/dnsmasq.conf
-        cat /etc/dnsmasq.conf
-fi
+## if [ ! -f /etc/dnsmasq.conf ]; then
+cp  $CURRENT_DIR/dnsmasq.conf /etc/dnsmasq.conf
+cat /etc/dnsmasq.conf
+## fi
 
 ## start dnsmasq service!
 systemctl restart dnsmasq.service&
@@ -90,7 +92,7 @@ echo "tftpd installed? $T_VAR"
 if [ "$T_VAR" != "/usr/sbin/in.tftpd" ]; then
         ## installation of tftpd-hpa must be performed!
 	echo "Installing: apt-get install tftpd-hpa"
-        apt-get install tftpd-hpa
+        DEBIAN_FRONTEND=noninteractive apt-get -y install tftpd-hpa
 fi
 
 ## Does tftpd config file exist?
@@ -100,7 +102,7 @@ if [ -f /etc/default/tftpd-hpa ]; then
 	if [ "$T_VAR" == "0.0.0.0:69" ]; then
 		echo "Listening on all network UDP ports? $T_VAR"
 	else
-		cp ./tftpd-hpa /etc/default/tftpd-hpa
+		cp $CURRENT_DIR/tftpd-hpa /etc/default/tftpd-hpa
 		echo " Creating the politically correct tftpd-hpa config file"
 	fi
 fi
@@ -123,8 +125,8 @@ echo "egctl is installed? $T_VAR"
 if [ "$T_VAR" != "[installed]" ]; then
         ## installation of egctl must be performed!
 	echo "Installing: apt-get install egctl"
-        apt-get install egctl
-        cp ./egtab /etc/egtab
+        DEBIAN_FRONTEND=noninteractive apt-get -y install egctl
+        cp $CURRENT_DIR/egtab /etc/egtab
 fi
 
 ## Switch on egctl
@@ -142,7 +144,7 @@ echo "nmap is installed? $T_VAR"
 if [ "$T_VAR" != "[installed]" ]; then
         ## installation of egctl must be performed!
 	echo "Installing: apt-get install nmap"
-        apt-get install nmap
+        DEBIAN_FRONTEND=noninteractive apt-get -y install nmap
 fi
 
 ## [7] start systemd-networkd
