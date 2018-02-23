@@ -14,7 +14,7 @@
 
 echo "START test script: test.sh"
 
-CURRENT_DIR=`pwd`
+CURRENT_DIR=/vagrant1/private-net
 
 ## Change owner of the private-net directory since these are the system settings
 chown -R root:root /vagrant1/private-net
