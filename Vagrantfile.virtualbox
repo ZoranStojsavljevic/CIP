@@ -14,6 +14,7 @@
 ##
 ## In the Vagrantfile before the Vagrant.configure(2) do |config| line added the following code snippet:
 
+=begin
 $build = <<SCRIPT
 cd /vagrant
 set -e
@@ -25,6 +26,12 @@ integration-scripts/install_build_script.sh
 integration-scripts/configure_singledev.sh
 integration-scripts/install_lava.sh
 integration-scripts/configure_lava.sh
+SCRIPT
+=end
+
+$build = <<SCRIPT
+cd /vagrant1
+private-net/test.sh
 SCRIPT
 
 # Helper functions placed here!
@@ -39,8 +46,6 @@ def which(cmd)
   return nil
 end
 
-# usbfilter_exists and better_usbfilter_add originally part of a pull request
-# https://github.com/mitchellh/vagrant/issues/5774
 def usbfilter_exists(vendor_id, product_id)
   # Determine if a usbfilter with the provided Vendor/Product ID combination
   # already exists on this VM.
@@ -81,7 +86,7 @@ end
 
 Vagrant.configure(2) do |config|
   config.vm.provider :virtualbox do |vbox, override|
-    config.vm.box = "boxName"
+    config.vm.box = "debian/stretch64"
 
     ## vagrant plugin install vagrant-vbguest
     ## vagrant-vbguest: a vagrant plugin to keep VirtualBox Guest Additions up to date
@@ -101,18 +106,8 @@ Vagrant.configure(2) do |config|
     vbox.customize ["modifyvm", :id, "--usbehci", "on"]
     ## better_usbfilter_add(vbox, "ASIX Electronics Corp. AX88772 [0001]", "0B95", "7720", "AX88772")
     better_usbfilter_add(vbox, "0B95", "7720", "ASIX Electronics Corp. AX88772 [0001]")
+    better_usbfilter_add(vbox, "067B", "2303", "USB-Serial Controller")
   end
-
-=begin ## The previous AX88772 device definition, kept for some time...
-    vbox.customize ["usbfilter", "add", "0",
-      "--target", :id,
-      "--name", "ASIX Electronics Corp. AX88772 [0001]",
-      "--vendorid", "0B95",
-      "--productid", "7720",
-      "--revision", "0001",
-      "--manufacturer", "ASIX Electronics Corp.",
-      "--product", "AX88772"]
-=end
 
   ## Common stuff, independept of the "any" Virtual Provider used!
 
@@ -132,13 +127,13 @@ Vagrant.configure(2) do |config|
     config.proxy.no_proxy = "localhost,127.0.0.1,.siemens.com,.siemens.de,.siemens.net,.siemens.rocks,.siemens.io,.saacon.net"
   ## =end
   end
-  
-  ## Vagrant network configuration ==>> very tricky part! Please, be aware!
+
+  ## Vagrant network configuration ==>> MUST stay as original!?
 
   # Forward port 8888 for the internal REST server
   config.vm.network :forwarded_port, guest: 8888, host: 8888
-  # Forward port 8020 for the ser2net terminal
-  config.vm.network :forwarded_port, guest: 8020, host: 8020
+  ## Forward port 8020 for the ser2net terminal
+  ## config.vm.network :forwarded_port, guest: 8020, host: 8020
   # Forward port 8010 for the Storage Server
   config.vm.network :forwarded_port, guest: 8010, host: 8010
   # Forward port 5000 for the KernelCI Frontend Web Server
@@ -149,17 +144,6 @@ Vagrant.configure(2) do |config|
   config.vm.network :forwarded_port, guest: 443, host: 4443
   # Configure network accessibility for tftp server
   config.vm.network "public_network", use_dhcp_assigned_default_route: true
-
-  # Templates for the vagrant networking. Vagrant networking block does not work as described
-
-  ## config.vm.network "private_network", bridge: "eth2", ip: "192.168.15.2"
-  ## config.vm.network "private_network", bridge: "eth2", ip: "192.168.15.2", type: "static"
-  ## config.vm.network "public_network", :dev => "eth1", ip: "192.168.15.2"
-  ## config.vm.network "public_network", :dev => "eth1", use_dhcp_assigned_default_route: true
-  ## config.vm.network "private_network", bridge: "eth1"
-  ## config.vm.network "private_network", bridge: "eth2", ip: "192.168.15.2"
-  ## config.vm.network "public_network", use_dhcp_assigned_default_route: true
-  ## config.vm.network "private_network", :dev => "eth2", use_dhcp_assigned_default_route: true
 
 =begin
   ## Run Ansible from the Vagrant Host
@@ -183,9 +167,10 @@ Vagrant.configure(2) do |config|
 =end
 
   config.vm.provision "shell" do |s|
-    s.privileged = false
+    s.privileged = true
     s.inline = $build
   end
 
-  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+##  config.vm.synced_folder ".", "/vagrant",  type: "rsync"
+  config.vm.synced_folder ".", "/vagrant1", type: "rsync"
 end
