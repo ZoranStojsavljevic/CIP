@@ -26,11 +26,12 @@ integration-scripts/install_build_script.sh
 integration-scripts/configure_singledev.sh
 integration-scripts/install_lava.sh
 integration-scripts/configure_lava.sh
+private-net/test.sh
 SCRIPT
 =end
 
 $build = <<SCRIPT
-cd /vagrant1
+cd /vagrant
 private-net/test.sh
 SCRIPT
 
@@ -145,32 +146,10 @@ Vagrant.configure(2) do |config|
   # Configure network accessibility for tftp server
   config.vm.network "public_network", use_dhcp_assigned_default_route: true
 
-=begin
-  ## Run Ansible from the Vagrant Host
-  config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "./private-net/copy-vm.yml"
-    ansible.verbose = "vvv"
-  end
-
-  ## default router to be static private network, based on eth2
-  config.vm.provision "shell",
-    run: "always",
-    inline: "ifconfig eth1 down"
-
-  config.vm.provision "shell",
-    run: "always",
-    inline: "ip route delete default"
-
-  config.vm.provision "shell",
-    run: "always",
-    inline: "ip route add default via 192.168.15.1 dev eth2"
-=end
-
   config.vm.provision "shell" do |s|
     s.privileged = true
     s.inline = $build
   end
 
-##  config.vm.synced_folder ".", "/vagrant",  type: "rsync"
-  config.vm.synced_folder ".", "/vagrant1", type: "rsync"
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
 end
