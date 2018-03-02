@@ -14,10 +14,10 @@
 
 echo "START test script: test.sh"
 
-CURRENT_DIR=/vagrant1/private-net
+CURRENT_DIR=/vagrant/private-net
 
 ## Change owner of the private-net directory since these are the system settings
-chown -R root:root /vagrant1/private-net
+chown -R root:root /vagrant/private-net
 
 ## [1] Check if there is a route to www/0.0.0.0, so the necessary setup could be performed
 T_VAR=`ip route show | grep default | awk '{print $1}'`
