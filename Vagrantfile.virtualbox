@@ -14,7 +14,6 @@
 ##
 ## In the Vagrantfile before the Vagrant.configure(2) do |config| line added the following code snippet:
 
-=begin
 $build = <<SCRIPT
 cd /vagrant
 set -e
@@ -27,12 +26,11 @@ integration-scripts/configure_singledev.sh
 integration-scripts/install_lava.sh
 integration-scripts/configure_lava.sh
 SCRIPT
-=end
 
-$build = <<SCRIPT
-cd /vagrant
-private-net/test.sh
-SCRIPT
+## $build = <<SCRIPT
+## cd /vagrant
+## private-net/test.sh
+## SCRIPT
 
 # Helper functions placed here!
 def which(cmd)
@@ -167,7 +165,7 @@ Vagrant.configure(2) do |config|
 =end
 
   config.vm.provision "shell" do |s|
-    s.privileged = true
+    s.privileged = false
     s.inline = $build
   end
 
