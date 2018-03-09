@@ -92,19 +92,19 @@ echo "tftpd installed? $T_VAR"
 if [ "$T_VAR" != "/usr/sbin/in.tftpd" ]; then
         ## installation of tftpd-hpa must be performed!
 	echo "Installing: apt-get install tftpd-hpa"
-        DEBIAN_FRONTEND=noninteractive apt-get -y install tftpd-hpa
+	DEBIAN_FRONTEND=noninteractive apt-get -y install tftpd-hpa
 fi
 
 ## Does tftpd config file exist?
-if [ -f /etc/default/tftpd-hpa ]; then
-	T_VAR=`cat /etc/default/tftpd-hpa | grep "0.0.0.0:69" | sed 's/"/ /g' | awk '{print $2}'`
-	## Test along the execution
-	if [ "$T_VAR" == "0.0.0.0:69" ]; then
-		echo "Listening on all network UDP ports? $T_VAR"
-	else
-		cp $CURRENT_DIR/tftpd-hpa /etc/default/tftpd-hpa
-		echo " Creating the politically correct tftpd-hpa config file"
-	fi
+if [ ! -f /etc/default/tftpd-hpa ]; then
+	cp $CURRENT_DIR/tftpd-hpa /etc/default/tftpd-hpa
+	echo " Creating the politically correct tftpd-hpa config file"
+fi
+
+T_VAR=`cat /etc/default/tftpd-hpa | grep "0.0.0.0:69" | sed 's/"/ /g' | awk '{print $2}'`
+## Test along the execution
+if [ "$T_VAR" == "0.0.0.0:69" ]; then
+        echo "Listening on all network UDP ports? $T_VAR"
 fi
 
 ## Does tftpd runs in the VM (should)?
@@ -126,13 +126,16 @@ if [ "$T_VAR" != "[installed]" ]; then
         ## installation of egctl must be performed!
 	echo "Installing: apt-get install egctl"
         DEBIAN_FRONTEND=noninteractive apt-get -y install egctl
+fi
+
+if [ ! -f /etc/egtab ]; then
         cp $CURRENT_DIR/egtab /etc/egtab
 fi
 
 ## Switch on egctl
-egctl egenie off off off off > /dev/null
+egctl egenie on on on on > /dev/null
 sleep 1
-egctl egenie on off off off > /dev/null
+egctl egenie off off off off > /dev/null
 
 ## [6] Configure and test nmap application - nmap
 
