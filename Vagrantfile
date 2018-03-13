@@ -14,7 +14,7 @@
 ##
 ## In the Vagrantfile before the Vagrant.configure(2) do |config| line added the following code snippet:
 
-=begin
+## =begin
 $build = <<SCRIPT
 cd /vagrant
 set -e
@@ -27,12 +27,7 @@ integration-scripts/configure_singledev.sh
 integration-scripts/install_lava.sh
 integration-scripts/configure_lava.sh
 SCRIPT
-=end
-
-$build = <<SCRIPT
-cd /vagrant
-private-net/test.sh
-SCRIPT
+## =end
 
 # Helper functions placed here!
 def which(cmd)
@@ -87,6 +82,7 @@ end
 Vagrant.configure(2) do |config|
   config.vm.provider :virtualbox do |vbox, override|
     config.vm.box = "debian/stretch64"
+    config.vm.box_check_update = true
 
     ## vagrant plugin install vagrant-vbguest
     ## vagrant-vbguest: a vagrant plugin to keep VirtualBox Guest Additions up to date
@@ -104,9 +100,18 @@ Vagrant.configure(2) do |config|
 
     vbox.customize ["modifyvm", :id, "--usb", "on"]
     vbox.customize ["modifyvm", :id, "--usbehci", "on"]
+
+    ## Old usbfilter_add interface, obsolete
     ## better_usbfilter_add(vbox, "ASIX Electronics Corp. AX88772 [0001]", "0B95", "7720", "AX88772")
+
+    ## VBox passthrough for the USB/ETH device for DUT 
     better_usbfilter_add(vbox, "0B95", "7720", "ASIX Electronics Corp. AX88772 [0001]")
+
+    ## VBox passthrough for USB2SER for BBB01 DUT
     better_usbfilter_add(vbox, "067B", "2303", "USB-Serial Controller")
+
+    ## VBox passthrough for USB2SER for iwg20m DUT
+    better_usbfilter_add(vbox, "0403", "6001", "FTDI FT232R USB UART [0600]")
   end
 
   ## Common stuff, independept of the "any" Virtual Provider used!
@@ -166,10 +171,17 @@ Vagrant.configure(2) do |config|
     inline: "ip route add default via 192.168.15.1 dev eth2"
 =end
 
+=begin
   config.vm.provision "shell" do |s|
-    s.privileged = true
+    s.privileged = false
     s.inline = $build
   end
+=end
+
+  $script_true = "/bin/bash /vagrant/private-net/test.sh"
+  config.vm.provision :shell, privileged: true, inline: $script_true
+
+  ## config.vm.provision :shell, :path => "/vagrant/private-net/test.sh", privileged: true
 
   config.vm.synced_folder ".", "/vagrant", type: "rsync"
 end
