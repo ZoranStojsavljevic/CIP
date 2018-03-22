@@ -1,1 +1,82 @@
+# Copyright (C) 2018, on behalf of Siemens AG, Zoran Stojsavljevic <zoran.stojsavljevic@gmail.com>
+# SPDX-License-Identifier:	AGPL-3.0
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+device_type: beaglebone-black
+
+# NFS fails on panda and arndale.
+
+job_name: local test of ramdisk test on bbb
+timeouts:
+  job:
+    minutes: 10
+  action:
+    minutes: 5
+  connection:
+    minutes: 2
+priority: medium
+visibility: public
+
+
+# ACTION_BLOCK
+actions:
+- deploy:
+    timeout:
+      minutes: 4
+    to: tftp
+    kernel:
+      url: http://localhost:8010/cip-example/cip_v4.4.120-cyclic/v4.4.120-cip20-rt13/arm/omap2plus_defconfig/zImage
+      type: zimage
+    ramdisk:
+      url: http://localhost:8010/initramfs/initramfs.cpio.gz
+      sha256sum: 2f3c091403548c05e79c25d602d631fbcc58af68a9266b78e43a97b0ded670d5
+      compression: gz
+      # the bootloader needs a u-boot header on the modified ramdisk
+      add-header: u-boot
+    # despite this being a Debian initramfs, it is not a complete Debian rootfs, so use oe compatibility
+    os: oe
+    dtb:
+      # and again
+      url: http://localhost:8010/cip-example/cip_v4.4.120-cyclic/v4.4.120-cip20-rt13/arm/omap2plus_defconfig/dtbs/am335x-boneblack.dtb
+
+
+# BOOT_BLOCK
+- boot:
+    method: u-boot
+    commands: ramdisk
+    auto_login:
+      login_prompt: 'login:'
+      username: root
+    prompts:
+    - 'root@beaglebone:'
+    timeout:
+      minutes: 3
+
+
+# TEST_BLOCK
+- test:
+    timeout:
+      minutes: 4
+    definitions:
+    - repository:
+        metadata:
+          name: simple-commands
+          description: "check shell"
+          os:
+          - oe
+          scope:
+          - functional
+        run:
+          steps:
+          - ls
+          - pwd
+          - uname -a
+          - which hackbench
+          - which cyclictest
+      from: inline
+      path: bbb_test1.yaml
+      name: smoke-tests
