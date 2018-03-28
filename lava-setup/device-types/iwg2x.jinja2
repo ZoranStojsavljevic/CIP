@@ -1,1 +1,20 @@
+{% extends 'base-uboot.jinja2' %}
 
+{% set console_device = console_device|default('ttySC0') %}
+{% set baud_rate = baud_rate|default(115200) %}
+{% set device_type = "iwg2x" %}
+{% set bootm_kernel_addr = '0x40007fc0' %}
+{% set bootm_ramdisk_addr = '0x41000000' %}
+{% set bootm_dtb_addr = '0x40f00000' %}
+{% set bootm_low = '0x41e00000' %}
+{% set bootm_size = '0x1000000' %}
+{% set bootz_kernel_addr = '0x40007fc0' %}
+{% set bootz_ramdisk_addr = '0x41000000' %}
+{% set bootz_dtb_addr = '0x40f00000' %}
+{% set interrupt_prompt = interrupt_prompt|default('Hit any key to stop autoboot') %}
+{% set interrupt_char = interrupt_char|default('') %}
+{% set bootloader_prompt = bootloader_prompt|default('iWave-G20M >') %}
+{% set usb_uuid = usb_uuid|default('') %}
+{% set usb_device_id = usb_device_id|default('') %}
+{% set uboot_mkimage_arch = 'arm' %}
+{% set serverip = serverip|default('192.168.15.2') %}
