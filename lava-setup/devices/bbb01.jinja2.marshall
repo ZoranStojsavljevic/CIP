@@ -1,6 +1,6 @@
 {% extends 'beaglebone-black.jinja2' %}
 
-{% set connection_command = 'telnet localhost 8020' %}
+{% set connection_command = '/vagrant/scripts/connectBBB.sh localhost 8020 root root' %}
 {% set power_on_command = '/usr/bin/egctl egenie on left left left' %}
 {% set power_off_command = '/usr/bin/egctl egenie off left left left' %}
 {% set hard_reset_command = '/usr/bin/egctl egenie on left left left' %}
