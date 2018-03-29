@@ -1,0 +1,9 @@
+test.sh is /bin/bash shell script, vagrant provisioner, which seamlessly works for both bbb01 and iwg20m.
+
+It'll work for ANY board, if the passthrough rules are obeyed!
+
+The passthrough devices for both boards are created and execised in Vagrant builder.
+
+There are two Vagrant builders:
+[1] Vagrantfile.virtualbox used for initial VM creation.
+[2] Vagrantfile used afterwards (CAUTION: these two files are different, and they overlap by the name (since Vagrantfile.virtualbox becomes Vagrantfile, so, PLEASE, rename Vagrantfile BEFORE executing VM creation!!!))
