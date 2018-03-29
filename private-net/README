@@ -6,4 +6,4 @@ The passthrough devices for both boards are created and execised in Vagrant buil
 
 There are two Vagrant builders:
 [1] Vagrantfile.virtualbox used for initial VM creation.
-[2] Vagrantfile used afterwards (CAUTION: these two files are different, and they overlap by the name (since Vagrantfile.virtualbox becomes Vagrantfile, so, PLEASE, rename Vagrantfile BEFORE executing VM creation!!!))
+[2] Vagrantfile used afterwards (CAUTION: these two files are different, and they overlap by the name (since Vagrantfile.virtualbox becomes Vagrantfile, so, PLEASE, rename Vagrantfile BEFORE executing VM creation!!!)
