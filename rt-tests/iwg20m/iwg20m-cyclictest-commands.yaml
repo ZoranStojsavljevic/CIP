@@ -1,0 +1,88 @@
+# Copyright (C) 2018, on behalf of Siemens AG, Zoran Stojsavljevic (zoran.stojsavljevic@gmail.com)
+# SPDX-License-Identifier:	AGPL-3.0
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+device_type: iwg2x
+
+# NFS fails on panda and arndale.
+
+job_name: local test of shell commands (as well as uname -a) on iwg20m
+timeouts:
+  job:
+    minutes: 10
+  action:
+    minutes: 5
+  connection:
+    minutes: 2
+priority: medium
+visibility: public
+
+
+# ACTION_BLOCK
+actions:
+- deploy:
+    timeout:
+      minutes: 5
+    to: tftp
+    kernel:
+      url: http://localhost:8010/cip-example/v4.4.120-cip20-iwg20m/v4.4.120-cip20-rt13/arm/shmobile_defconfig/zImage
+      type: zimage
+    ramdisk:
+      # use locally built initramfs (see https://wiki.linuxfoundation.org/civilinfrastructureplatform/cipsystembuildhowto)
+      # url: http://images.validation.linaro.org/snapshots.linaro.org/components/lava/standard/debian/jessie/armhf/4/initramfs.cpio.gz
+      url: http://localhost:8010/initramfs/initramfs.cpio.gz
+      compression: gz
+      # the bootloader needs a u-boot header on the modified ramdisk
+      add-header: u-boot
+    modules:
+      # matching the kernel
+      url: http://localhost:8010/cip-example/v4.4.120-cip20-iwg20m/v4.4.120-cip20-rt13/arm/shmobile_defconfig/modules.tar.xz
+      compression: xz
+    # despite this being a Debian initramfs, it is not a complete Debian rootfs, so use oe compatibility
+    os: oe
+    dtb:
+      # and again
+      url: http://localhost:8010/cip-example/v4.4.120-cip20-iwg20m/v4.4.120-cip20-rt13/arm/shmobile_defconfig/dtbs/r8a7743-iwg20d-q7.dtb
+
+
+# BOOT_BLOCK
+- boot:
+    method: u-boot
+    commands: ramdisk
+    auto_login:
+      login_prompt: 'login:'
+      username: root
+    prompts:
+    - 'root@iwg20d:'
+    timeout:
+      minutes: 3
+
+
+# TEST_BLOCK
+- test:
+    timeout:
+      minutes: 4
+    definitions:
+    - repository:
+        metadata:
+          name: simple-commands
+          description: "check shell"
+          os:
+          - oe
+          scope:
+          - functional
+        run:
+          steps:
+          - ls
+          - pwd
+          - uname -a
+          - which top
+          - which cyclictest
+          - which hackbench
+      from: inline
+      path: iwg20m-cyclictest-commands.yaml
+      name: smoke-tests

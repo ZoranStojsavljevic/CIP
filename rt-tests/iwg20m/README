@@ -22,3 +22,5 @@ vagrant@guest:~/git-repos/linux-cip$ ~/kernelci-build/build.py -c shmobile_defco
 Both iwg20m Lava tests are working with above described ingrediences:
 iwg20m-shell-test.yaml
 iwg20m-smoke-test.yaml
+
+Unfortunately, I could not test out of CIP built initramfs.gpio.gz, since it requires iwg20m prompt, and I never got to come to the Linux prompt, rumnning the plain U-Boot. Very close, but...
