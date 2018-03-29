@@ -1,0 +1,49 @@
+For -rt testing the following options are set on the kernel:
+
+CONFIG_SMP=n
+CONFIG_MODULES=n
+
+CONFIG_DEBUG_ATOMIC_SLEEP=y
+CONFIG_DEBUG_LOCK_ALLOC=n
+CONFIG_PROVE_LOCKING=n
+CONFIG_LOCKDEP=n
+
+CONFIG_CPU_FREQ=n
+CONFIG_CPU_IDLE=n
+
+CONFIG_NO_HZ=n
+CONFIG_HZ_PERIODIC=y
+
+CONFIG_HZ_250=y
+CONFIG_HZ=250
+
+CONFIG_SUSPEND=n
+CONFIG_HIBERNATION=n
+CONFIG_PM=n
+
+CONFIG_FTRACE=n
+
+CONFIG_PREEMPT_RT_FULL=y
+_______
+
+Please, find the correct entire (NOT fragments) .config in this directory, named CONFIG-rt and CONFIG_rt_bbb01:
+
+And here are results from the run, which lasted around ~50 minutes (~3 million cycles):
+
+root@beaglebone:~# uname -a
+Linux beaglebone 4.4.120-cip20-rt13-dirty #1 PREEMPT RT Fri Mar 16 13:41:18 GMT 2018 armv7l GNU/Linux
+
+root@beaglebone:~# cyclictest -p 80 -n -m -S
+# /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 203.66 71.89 25.88 159/504 8144         
+policy: fifo: loadavg: 282.71 297.38 290.00 196/504 10767         
+T: 0 ( 7343) P:80 I:1000 C:   9151 Min:     19 Act:   44 Avg:   42 Max:      68
+T: 0 ( 7343) P:80 I:1000 C:3129069 Min:      8 Act:   31 Avg:   42 Max:      81
+
+The test was run from the DUT shells (done with ssh root@local-ip-address).
+
+The Lava tests:
+bbb01-cyclic-test-genesis.yaml
+bbb01-cyclic-test.yaml
+
+Are attempts to emulate the same RT test in Lava environment!
