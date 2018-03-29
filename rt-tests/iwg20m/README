@@ -1,0 +1,24 @@
+The two tests presented here are working on the rt-kernel cip_v4.4.120-rt13, from the following context:
+
+The 4.4.120-cip20-rt13 stable release.
+
+This release is just an update to the new stable 4.4.120-cip20 version
+and no RT specific changes have been made.
+
+You can get this release via the git tree at:
+git://git.kernel.org/pub/scm/linux/kernel/git/wagi/linux-cip-rt.git
+
+The initramfs.gpio.gz is generic one, created from the:
+
+https://wiki.linuxfoundation.org/civilinfrastructureplatform/cipsystembuildhowto
+Creating an initramfs with BusyBox for the Beaglebone Black (iwg20m)
+
+The kernel handling is from:
+Building the CIP Kernel with Kernel CI
+
+The command used:
+vagrant@guest:~/git-repos/linux-cip$ ~/kernelci-build/build.py -c shmobile_defconfig -p CIP-KernelCI
+
+Both iwg20m Lava tests are working with above described ingrediences:
+iwg20m-shell-test.yaml
+iwg20m-smoke-test.yaml
